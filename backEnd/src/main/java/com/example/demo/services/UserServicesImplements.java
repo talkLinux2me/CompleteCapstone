@@ -137,41 +137,39 @@ public class UserServicesImplements implements UserServices {
     }
 
 
+    public List<User> getAllFreeMentors() {
+        List<User> allUsers = userRepository.findAll();
+        List<User> mentors = new ArrayList<>();
 
-
-    public List<User> getAllFreeMentors(){
-            List<User> allUsers = userRepository.findAll();
-            List<User> mentors = new ArrayList<>();
-
-            for (User user : allUsers) {
-                if ("mentor".equalsIgnoreCase(user.getRole())) {
-                    mentors.add(user);
-                }
+        for (User user : allUsers) {
+            if ("mentor".equalsIgnoreCase(user.getRole())) {
+                mentors.add(user);
             }
+        }
 
-       return mentors;
+        return mentors;
 
     }
 
-    public List<User> getAllFreeMentees(){
+    public List<User> getAllFreeMentees() {
         List<User> allUsers = userRepository.findAll();
         List<User> mentees = new ArrayList<>();
 
         for (User user : allUsers) {
 
-         if ("mentee".equalsIgnoreCase(user.getRole())) {
-            mentees.add(user);
-        }
+            if ("mentee".equalsIgnoreCase(user.getRole())) {
+                mentees.add(user);
+            }
         }
         return mentees;
     }
 
 
-    public Optional <User> editUserProfile(Long userId, EditUserDTO newDetails){
+    public Optional<User> editUserProfile(Long userId, EditUserDTO newDetails) {
 
         Optional<User> foundUser = userRepository.findById(userId);
 
-        if(foundUser.isPresent()){
+        if (foundUser.isPresent()) {
             foundUser.get().setLocation(newDetails.getLocation());
             foundUser.get().setMeetingType(newDetails.getMeetingType());
             foundUser.get().setCertifications(newDetails.getCertifications());
@@ -240,5 +238,21 @@ public class UserServicesImplements implements UserServices {
         }
 
         return score; // Return the total score
+    }
+    //new code incoming...
+
+    @Override
+    public List<User> getUsersByRole(String role) {
+        return List.of();
+    }
+
+    @Override
+    public List<User> getUsersByCertification(String certification) {
+        return List.of();
+    }
+
+    @Override
+    public List<User> getUsersWithMoreThanYearsOfExperience(int years) {
+        return List.of();
     }
 }

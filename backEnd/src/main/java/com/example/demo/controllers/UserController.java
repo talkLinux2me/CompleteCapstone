@@ -1,19 +1,17 @@
 package com.example.demo.controllers;
 
 import com.example.demo.dto.EditUserDTO;
+import com.example.demo.dto.LoginRequest;
+import com.example.demo.models.User;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.services.UserServices;
+import com.example.demo.services.MatchingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import com.example.demo.dto.LoginRequest;
-import com.example.demo.dto.MatchDTO;
-import com.example.demo.models.User;
-import com.example.demo.services.UserServices;
-import com.example.demo.services.MatchingService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,12 +32,17 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Registers a new user.
+     *
+     * @param newUser The user object containing registration details.
+     * @return ResponseEntity with status and user details if successful.
+     */
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User newUser) {
         logger.info("Registering user: {}", newUser.getEmail());
         Optional<User> existingUser = userServices.findByEmail(newUser.getEmail());
 
-        logger.info(String.valueOf(existingUser));
         if (existingUser.isPresent()) {
             logger.warn("Email already in use: {}", newUser.getEmail());
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Email is already in use.");
@@ -55,13 +58,19 @@ public class UserController {
         }
     }
 
+    /**
+     * Authenticates a user and logs them in.
+     *
+     * @param loginRequest The login request containing email and password.
+     * @return ResponseEntity with authentication token and user details if successful.
+     */
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
         logger.info("User login attempt: {}", loginRequest.getEmail());
         Optional<User> user = userServices.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
 
         if (user.isPresent()) {
-            HashMap response = new HashMap<>();
+            HashMap<String, Object> response = new HashMap<>();
             response.put("token", "granted");
             response.put("userID", user.get().getId());
             response.put("role", user.get().getRole());
@@ -73,6 +82,11 @@ public class UserController {
         }
     }
 
+    /**
+     * Retrieves all registered users.
+     *
+     * @return ResponseEntity with the list of users.
+     */
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {
         logger.info("Fetching all users");
@@ -80,6 +94,12 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    /**
+     * Retrieves a user by their ID.
+     *
+     * @param id The ID of the user to retrieve.
+     * @return ResponseEntity with user details or 404 if not found.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         logger.info("Fetching user by ID: {}", id);
@@ -94,6 +114,36 @@ public class UserController {
                 });
     }
 
+    /**
+     * Updates a user's profile information.
+     *
+     * @param userID     The ID of the user to update.
+     * @param newDetails The new details for the user.
+     * @return ResponseEntity with updated user details or an error message.
+     */
+    @PutMapping("/edit/{userID}")
+    public ResponseEntity<?> editUser(@PathVariable Long userID, @RequestBody EditUserDTO newDetails) {
+        Optional<User> foundUser = userServices.editUserProfile(userID, newDetails);
+
+        return foundUser.isPresent()
+                ? ResponseEntity.ok().body(foundUser.get())
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found or update failed");
+    }
+
+    /**
+     * Deletes a user by their ID.
+     *
+     * @param id The ID of the user to delete.
+     * @return ResponseEntity indicating the result of the deletion.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        logger.info("Deleting user with ID: {}", id);
+        userServices.deleteUserById(id);
+        return ResponseEntity.ok().body("User deleted successfully");
+    }
+
+    // Mentoring-related endpoints
     @PostMapping("/{mentorId}/add-mentee/{menteeId}")
     public ResponseEntity<?> addMentee(@PathVariable Long mentorId, @PathVariable Long menteeId) {
         logger.info("Adding mentee with ID: {} to mentor with ID: {}", menteeId, mentorId);
@@ -102,36 +152,6 @@ public class UserController {
                 ? ResponseEntity.ok(result.get())
                 : ResponseEntity.notFound().build();
     }
-
-//    @PostMapping("user/{menteeId}")
-//    public ResponseEntity<?> addMentee(@PathVariable Long menteeId) {
-//        logger.info("Adding mentee with ID: {}", menteeId);
-//        Optional<User> result = userServices.addMentee(menteeId);
-//        return result.isPresent()
-//                ? ResponseEntity.ok(result.get())
-//                : ResponseEntity.notFound().build();
-//    }
-
-//    @PutMapping("/{id}")
-//    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User userDetails) {
-//        Optional<User> user = userRepository.findById(id);
-//        if (user.isPresent()) {
-//            User updatedUser = user.get();
-//            updatedUser.setCertifications(userDetails.getCertifications());
-//            updatedUser.setYearsOfExperience(userDetails.getYearsOfExperience());
-//            updatedUser.setLocation(userDetails.getLocation());
-//            updatedUser.setCodingLanguage(userDetails.getCodingLanguage());
-//            updatedUser.setAvailability(userDetails.getAvailability());
-//            updatedUser.setMeetingType(userDetails.getMeetingType());
-//            userRepository.save(updatedUser);
-//            return ResponseEntity.ok(updatedUser);
-//        } else {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-
-
-
 
     @DeleteMapping("/{mentorId}/remove-mentee/{menteeId}")
     public ResponseEntity<?> removeMentee(@PathVariable Long mentorId, @PathVariable Long menteeId) {
@@ -160,61 +180,28 @@ public class UserController {
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).body("User has no mentors");
     }
 
-    @GetMapping("/{menteeId}/matches")
-    public ResponseEntity<List<MatchDTO>> getMatches(@PathVariable Long menteeId) {
-        logger.info("Fetching matches for mentee with ID: {}", menteeId);
-        List<User> matches = matchingService.matchMentees(menteeId);
-        return matches.isEmpty()
-                ? ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of())
-                : (ResponseEntity<List<MatchDTO>>) ResponseEntity.ok();
-    }
-
-
-
     @GetMapping("/getAllMentors")
-    public  ResponseEntity<?> getAllMentors(){
+    public ResponseEntity<?> getAllMentors() {
         List<User> allMentors = userServices.getAllFreeMentors();
-        return  ResponseEntity.ok().body(allMentors);
+        return ResponseEntity.ok().body(allMentors);
     }
-
 
     @GetMapping("/getAllMentees")
-    public  ResponseEntity<?> getAllMentees(){
+    public ResponseEntity<?> getAllMentees() {
         List<User> allMentees = userServices.getAllFreeMentees();
-        return  ResponseEntity.ok().body(allMentees);
+        return ResponseEntity.ok().body(allMentees);
     }
-
-
-
-    @PutMapping("/edit/{userID}")
-    public ResponseEntity<?> editUser(@PathVariable Long userID, @RequestBody EditUserDTO newDetails) {
-        Optional<User> foundUser = userServices.editUserProfile(userID, newDetails);
-
-        if (foundUser.isPresent()) {
-            return ResponseEntity.ok().body(foundUser.get());
-        }
-
-        return ResponseEntity.ok().body("OOpsie something happened");
-
-    }
-
-
 
     @GetMapping("/match/{menteeId}")
     public ResponseEntity<User> matchMenteeWithMentor(@PathVariable Long menteeId) {
-        // Fetch the mentee based on ID
-       Optional<User> mentee = userRepository.findById(menteeId);
-
+        Optional<User> mentee = userRepository.findById(menteeId);
 
         if (!mentee.isPresent()) {
             return ResponseEntity.notFound().build(); // Return 404 if mentee not found
         }
 
-        // Fetch all mentors
         List<User> mentors = userServices.getAllFreeMentors();
-
-        // Get a matched mentor
-        User matchedMentor = userServices.matchMenteeWithMentor(mentee.get(),mentors);
+        User matchedMentor = userServices.matchMenteeWithMentor(mentee.get(), mentors);
 
         if (matchedMentor != null) {
             return ResponseEntity.ok(matchedMentor); // Return matched mentor
@@ -222,4 +209,24 @@ public class UserController {
             return ResponseEntity.noContent().build(); // Return 204 if no matches found
         }
     }
+
+    //added queries...
+    @GetMapping("/role/{role}")
+    public ResponseEntity<List<User>> getUsersByRole(@PathVariable String role) {
+        List<User> users = userServices.getUsersByRole(role);
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/certification/{certification}")
+    public ResponseEntity<List<User>> getUsersByCertification(@PathVariable String certification) {
+        List<User> users = userServices.getUsersByCertification(certification);
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/experience/{years}")
+    public ResponseEntity<List<User>> getUsersWithMoreThanYearsOfExperience(@PathVariable int years) {
+        List<User> users = userServices.getUsersWithMoreThanYearsOfExperience(years);
+        return ResponseEntity.ok(users);
+    }
+
 }

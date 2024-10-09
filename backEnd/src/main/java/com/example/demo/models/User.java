@@ -26,16 +26,15 @@ public class User {
     @Column(name = "email")
     private String email;
 
-    @Column(name= "certifications")
+    @Column(name = "certifications")
     private String certifications;
 
     @Column(name = "profile_pic")
     private String profilePic;
 
-
     @ElementCollection
     @Column(name = "expertise")
-    private List<String> expertise; // List of areas of expertise
+    private List<String> expertise; // Areas of expertise
 
     @Column(name = "years_of_experience")
     private int yearsOfExperience;
@@ -43,38 +42,33 @@ public class User {
     @Column(name = "location")
     private String location;
 
-    @Column(name ="role")
+    @Column(name = "role")
     private String role;
 
     @ElementCollection
-    @Column(name = "coding_language")
+    @Column(name = "coding_languages")
     private List<String> codingLanguage;
 
     @ElementCollection
     @Column(name = "availability")
     private List<String> availability; // part time, full time, on demand
 
-
     @Column(name = "meeting_type")
     private String meetingType; // "virtual" or "in-person"
 
-   @ElementCollection
-   @CollectionTable(name = "mentee_ids", joinColumns = @JoinColumn(name = "user_id"))
-   @Column(name = "mentee_id")
-   private List<Long> mentees;
+    @ElementCollection
+    @CollectionTable(name = "mentee_ids", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "mentee_id")
+    private List<Long> mentees;
 
-   @ElementCollection
-   @CollectionTable(name = "mentor_ids", joinColumns = @JoinColumn(name = "user_id"))
-   @Column(name = "mentor_id")
-   private List<Long> mentors;
+    @ElementCollection
+    @CollectionTable(name = "mentor_ids", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "mentor_id")
+    private List<Long> mentors;
 
+    private String personalStatement;
 
-   private String personalStatement;
+    private List<String> interests;
 
-
-   private List<String> interests;
-
-   private List <String> skills;
-
-
+    private List<String> skills;
 }

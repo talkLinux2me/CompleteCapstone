@@ -37,4 +37,14 @@ public interface UserServices {
 
     int calculateMatchScore(User mentee, User mentor);
 
+    //new code incoming
+
+    // Get users by their role
+    List<User> getUsersByRole(String role);
+
+    // Get users by certification
+    List<User> getUsersByCertification(String certification);
+
+    // Get users with more than a specified number of years of experience
+    List<User> getUsersWithMoreThanYearsOfExperience(int years);
 }

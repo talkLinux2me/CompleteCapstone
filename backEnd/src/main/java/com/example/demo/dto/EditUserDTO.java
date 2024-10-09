@@ -4,6 +4,11 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * Data Transfer Object (DTO) for editing user information.
+ * This class encapsulates the data required to update a user's profile.
+ */
+
 @Data
 public class EditUserDTO {
     private String location;

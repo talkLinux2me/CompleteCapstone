@@ -4,6 +4,11 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * Data Transfer Object (DTO) representing a match between a mentor and a mentee.
+ * This class encapsulates the details relevant to the mentorship pairing.
+ */
+
 @Data
 public class MatchDTO {
     private Long mentorId;
@@ -18,3 +23,4 @@ public class MatchDTO {
     private String certifications;
 }
 
+//future implementations code
