@@ -4,7 +4,6 @@ import TypewriterEffect from './TypewriterEffect';
 const Homepage = () => {
   return (
     <div className="backdrop-blur-background min-h-screen flex flex-col items-center p-12 bg-[#0e1c2d]">
-       <h1>HEllo</h1>
       <h1 className="text-5xl font-bold text-center mb-9 text-[#4d7eb9]">Welcome to Tech Mentor Mentee Connect</h1>
       <p className="text-2xl text-center mb-10 text-[#8e2fc5] font-semibold hover:underline">
         Connect with experienced mentors or find eager mentees to share knowledge and skills.
