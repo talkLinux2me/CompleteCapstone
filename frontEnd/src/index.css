@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes dance {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    25% {
+      transform: translateY(-10px) rotate(5deg);
+    }
+    50% {
+      transform: translateY(0) rotate(-5deg);
+    }
+    75% {
+      transform: translateY(-5px) rotate(3deg);
+    }
+  }
+  
+  .dance {
+    display: inline-block;
+    animation: dance 1s infinite;
+  }
+  .logo {
+    width: 50%; 
+  /* Set your desired width */
+    height: auto; /* Maintain aspect ratio */
+    /* transform: rotate(-15deg); Tilt the logo */
+    position: relative; /* Allow for positioning */
+    /* top: 20x; Move it up so it appears out of the navbar */
+    left: -10px; /* Adjust horizontal position if needed */
+    transition: transform 0.3s; /* Add transition for hover effect */
+  }
+  
+  .logo:hover {
+    transform: rotate(-10deg); /* Slightly adjust on hover for effect */
+  }
+  
+  
+/* 
+  .backdrop-blur-background {
+    background: linear-gradient(135deg, #4f759b, #571f4e, #3f6390, #6a1b9a);
+    background-size: 400% 400%;
+    animation: gradientAnimation 8s ease infinite;
+    height: 100vh; 
+  }
+  
+   @keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    25% { background-position: 100% 50%; }
+    50% { background-position: 100% 100%; }
+    75% { background-position: 0% 100%; }
+    100% { background-position: 0% 50%; }
+  }  */
+  
+  
+  .checkbox-label {
+      transition: color 0.3s ease;
+    }
+    
+    .checkbox-label:hover {
+      color: #4f759b; /* Tailwind's blue-500 */
+    }
+    
+    /* You can also style the checkbox itself if desired */
+    input[type="checkbox"]:hover {
+      cursor: pointer;
+    }
+      
+    .animate-scroll {
+      animation: scroll 30s linear infinite; /* Continuous scroll */
+      white-space: nowrap; /* Prevent line breaks */
+    }
+    
+    .scroll-container {
+      overflow: hidden; /* Hide overflowing content */
+      height: 150px; /* Adjust height as needed */
+      position: relative; /* Necessary for absolute positioning of inner content */
+    }
+    
+    
+    .text-xl {
+      font-size: 2.25rem; /* Adjust as needed */
+    }
+    
+    .font-semibold {
+      font-weight: 600; /* You can change the weight if you want */
+    }
+    
+    .my-6 {
+      margin-top: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    @keyframes wave-gradient {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+      
+      .navbar {
+        background: linear-gradient(270deg, #8b19b1, #d887ea, #6f0f8f);
+        background-size: 400% 400%;
+        animation: wave-gradient 15s ease infinite;
+      }
+      
+      footer {
+        position: relative;
+        bottom: 0;
+        width: 100%;
+      }
+      
